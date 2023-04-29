@@ -96,7 +96,6 @@ func readAllStdIn() string {
 
 func main() {
 
-	// Define permission flags
 	var fs string
 	var network bool
 	var gptVersion int
@@ -105,12 +104,10 @@ func main() {
 	flag.IntVar(&gptVersion, "gpt", 3, "GPT version, 3 or 4")
 	flag.Parse()
 
-	// Validate gptVersion flags
+	// Validate flags
 	if gptVersion != 3 && gptVersion != 4 {
 		log.Fatal("Invalid --gpt flag value, must be 3 or 4")
 	}
-
-	// Validate permission flags
 	if fs != "" && fs != "ro" && fs != "rw" {
 		log.Fatal("Invalid --fs flag value, must be 'ro' or 'rw'")
 	}
