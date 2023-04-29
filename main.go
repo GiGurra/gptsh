@@ -9,33 +9,51 @@ import (
 	"golang.org/x/crypto/ssh/terminal"
 	"log"
 	"os"
+	"strconv"
 )
 
 var openaiClient *openai.Client
+var gptVersionEnum = openai.GPT3Dot5Turbo
 
 // write init function to initialize openaiClient
 func init() {
 
 	openaiKey := os.Getenv("OPENAI_APIKEY")
-
 	if openaiKey == "" {
 		log.Fatal("Error: OPENAI_APIKEY environment variable is not set.")
 	}
-
 	openaiClient = openai.NewClient(openaiKey)
+
+	// init default gpt version from env var GPT_VERSION, either 3 or 4, convert from string to int
+	gptVersionStr := os.Getenv("GPT_VERSION")
+	if gptVersionStr != "" {
+		// convert string gptVersion to int using atoi
+		num, err := strconv.Atoi(gptVersionStr)
+		if err != nil {
+			log.Fatal("Error: GPT_VERSION environment variable is not set to a valid integer.")
+		}
+		// if num is 3 or 4, set gptVersionEnum to num, use a switch statement
+		switch num {
+		case 3:
+			gptVersionEnum = openai.GPT3Dot5Turbo
+		case 4:
+			gptVersionEnum = openai.GPT4
+		default:
+			log.Fatal("Error: GPT_VERSION environment variable is not set to a valid value (must be 3 or 4)")
+		}
+	}
 }
 
 func askGpt4(
 	command string,
 	data string,
-	gptVersion int,
+	gptVersionOvrd int,
 ) string {
 	// This function is assumed to be implemented already
 	// see https://github.com/sashabaranov/go-openai
 
 	// convert gptVersion to string, either openai.GPT3Dot5Turbo or openai.GPT4
-	gptVersionEnum := openai.GPT3Dot5Turbo
-	if gptVersion == 4 {
+	if gptVersionOvrd == 4 {
 		gptVersionEnum = openai.GPT4
 	}
 
@@ -103,7 +121,7 @@ func main() {
 	// Read command line arguments after flag parsing
 	args := flag.Args()
 	if len(args) == 0 {
-		log.Fatalf("Usage: %s [--fs=ro|--fs=rw] [--netw] <command>\n", os.Args[0])
+		log.Fatalf("Usage: %s [--fs=ro|--fs=rw] [--gpt=4|--gpt=3] [--netw] <command>\n", os.Args[0])
 	}
 
 	command := args[0]
