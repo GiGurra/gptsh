@@ -5,7 +5,7 @@ import (
 	"context"
 	"flag"
 	"fmt"
-	openai "github.com/sashabaranov/go-openai"
+	"github.com/sashabaranov/go-openai"
 	"io"
 	"log"
 	"os"
@@ -54,8 +54,7 @@ func askGpt4(
 	)
 
 	if err != nil {
-		fmt.Printf("ChatCompletion error: %v\n", err)
-		os.Exit(1)
+		log.Fatalf("ChatCompletion error: %v\n", err)
 	}
 	return resp.Choices[0].Message.Content
 }
@@ -71,15 +70,13 @@ func main() {
 
 	// Validate permission flags
 	if fs != "" && fs != "ro" && fs != "rw" {
-		_, _ = fmt.Fprintln(os.Stderr, "Invalid --fs flag value, must be 'ro' or 'rw'")
-		os.Exit(1)
+		log.Fatal("Invalid --fs flag value, must be 'ro' or 'rw'")
 	}
 
 	// Read command line arguments after flag parsing
 	args := flag.Args()
 	if len(args) == 0 {
-		_, _ = fmt.Fprintf(os.Stderr, "Usage: %s [--fs=ro|--fs=rw] [--netw] <command>\n", os.Args[0])
-		os.Exit(1)
+		log.Fatalf("Usage: %s [--fs=ro|--fs=rw] [--netw] <command>\n", os.Args[0])
 	}
 
 	command := args[0]
@@ -90,8 +87,7 @@ func main() {
 	for {
 		line, err := reader.ReadString('\n')
 		if err != nil && err != io.EOF {
-			_, _ = fmt.Fprintln(os.Stderr, "Error reading from stdin:", err)
-			os.Exit(2)
+			log.Fatal("Error reading from stdin:", err)
 		}
 		inputData += line
 		if err == io.EOF {
