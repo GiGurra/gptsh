@@ -55,27 +55,35 @@ func askGpt(
 		gptVersionEnum = openai.GPT4
 	}
 
+	messages := []openai.ChatCompletionMessage{
+		{
+			Role: openai.ChatMessageRoleSystem,
+			Content: "You are a CLI tool. Please process the following data + instruction.\n" +
+				"Your output should not include any explanations or markdown or such.\n" +
+				"Only raw cli output, so that it could be used for example inside a cli script or unix pipe (|) chain of operations.\n",
+		},
+	}
+
+	// append data to messages if not empty
+	if data != "" {
+		messages = append(messages, openai.ChatCompletionMessage{
+			Role:    openai.ChatMessageRoleUser,
+			Content: "data: " + data,
+		})
+	}
+
+	// append command to messages
+	messages = append(messages, openai.ChatCompletionMessage{
+		Role:    openai.ChatMessageRoleUser,
+		Content: "instruction: " + command,
+	})
+
 	resp, err := openaiClient.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
 			Model:       gptVersionEnum,
 			Temperature: 0.1,
-			Messages: []openai.ChatCompletionMessage{
-				{
-					Role: openai.ChatMessageRoleSystem,
-					Content: "You are a CLI tool. Please process the following data + instruction.\n" +
-						"Your output should not include any explanations or markdown or such.\n" +
-						"Only raw cli output, so that it could be used for example inside a cli script or unix pipe (|) chain of operations.\n",
-				},
-				{
-					Role:    openai.ChatMessageRoleUser,
-					Content: "data: " + data,
-				},
-				{
-					Role:    openai.ChatMessageRoleUser,
-					Content: "instruction: " + command,
-				},
-			},
+			Messages:    messages,
 		},
 	)
 
