@@ -1,4 +1,6 @@
 # gptsh
+Gpt3/4 on your CLI. Takes stdin + cli args and prints to stdout. Does not (yet) have any network or file system access.
+
 Some silly saturday morning gpt shell stuff. Written by GPT4 + github copilot. Uses GPT3.5-turbo by default.
 The results are pretty bad with gpt3.x, so I definitely recommend using gpt4. 
 
