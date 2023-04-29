@@ -48,12 +48,7 @@ func init() {
 func askGpt(
 	command string,
 	data string,
-	gptVersionOvrd int,
 ) string {
-
-	if gptVersionOvrd == 4 {
-		gptVersionEnum = openai.GPT4
-	}
 
 	messages := []openai.ChatCompletionMessage{
 		{
@@ -113,15 +108,16 @@ func main() {
 	flag.IntVar(&gptVersion, "gpt", 3, "GPT version, 3 or 4")
 	flag.Parse()
 
-	// Validate flags
+	// Process cli args
 	if gptVersion != 3 && gptVersion != 4 {
 		log.Fatal("Invalid --gpt flag value, must be 3 or 4")
+	}
+	if gptVersion == 4 {
+		gptVersionEnum = openai.GPT4
 	}
 	if fs != "" && fs != "ro" && fs != "rw" {
 		log.Fatal("Invalid --fs flag value, must be 'ro' or 'rw'")
 	}
-
-	// Read command line arguments after flag parsing
 	args := flag.Args()
 	if len(args) == 0 {
 		log.Fatalf("Usage: %s [--fs=ro|--fs=rw] [--gpt=4|--gpt=3] [--netw] <command>\n", os.Args[0])
@@ -140,6 +136,6 @@ func main() {
 		inputData = readAllStdIn()
 	}
 
-	result := askGpt(command, inputData, gptVersion)
+	result := askGpt(command, inputData)
 	fmt.Print(result)
 }
