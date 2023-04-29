@@ -132,6 +132,6 @@ func main() {
 		inputData = readAllStdIn()
 	}
 
-	result := askGpt(inputData, command, gptVersion)
+	result := askGpt(command, inputData, gptVersion)
 	fmt.Print(result)
 }
