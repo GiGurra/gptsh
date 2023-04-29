@@ -69,11 +69,11 @@ func askGpt(
 				},
 				{
 					Role:    openai.ChatMessageRoleUser,
-					Content: data,
+					Content: "data: " + data,
 				},
 				{
 					Role:    openai.ChatMessageRoleUser,
-					Content: command,
+					Content: "instruction: " + command,
 				},
 			},
 		},
