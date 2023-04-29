@@ -8,7 +8,7 @@ Unfortunately I don't have a gpt4 API key (the waitlist seems long), but I've ve
 ```ll . | gptsh "reverse line order" | gptsh "output as prettified json with some useful field names"```
 
 ## Installation
-```go install github.com/gigurra/gptsh@v<check-latest-git-tag>```
+```go install github.com/gigurra/gptsh@<check-latest-git-tag>```
 
 ## Environment variables
 * OPENAI_APIKEY -  Required. Your OpenAI API key.
