@@ -50,7 +50,6 @@ func askGpt(
 	gptVersionOvrd int,
 ) string {
 
-	// convert gptVersion to string, either openai.GPT3Dot5Turbo or openai.GPT4
 	if gptVersionOvrd == 4 {
 		gptVersionEnum = openai.GPT4
 	}
