@@ -8,6 +8,7 @@ Unfortunately I don't have a gpt4 API key (the waitlist seems long), but I've ve
 
 ## Usage
 
+Given a directory with 2 files (file1.txt and file2.bin):
 ```bash
 ll . | gptsh "reverse line order" | gptsh "output as prettified json with some useful field names"
 ```
