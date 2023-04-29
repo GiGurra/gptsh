@@ -44,7 +44,7 @@ func init() {
 	}
 }
 
-func askGpt4(
+func askGpt(
 	command string,
 	data string,
 	gptVersionOvrd int,
@@ -130,9 +130,6 @@ func main() {
 		inputData = readAllStdIn()
 	}
 
-	// Process input with GPT-4
-	processedData := askGpt4(inputData, command, gptVersion)
-
-	// Write output to stdout
-	fmt.Print(processedData)
+	result := askGpt(inputData, command, gptVersion)
+	fmt.Print(result)
 }
