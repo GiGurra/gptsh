@@ -49,8 +49,6 @@ func askGpt4(
 	data string,
 	gptVersionOvrd int,
 ) string {
-	// This function is assumed to be implemented already
-	// see https://github.com/sashabaranov/go-openai
 
 	// convert gptVersion to string, either openai.GPT3Dot5Turbo or openai.GPT4
 	if gptVersionOvrd == 4 {
