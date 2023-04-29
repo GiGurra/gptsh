@@ -1,12 +1,12 @@
 package main
 
 import (
-	"bufio"
+	"bytes"
 	"context"
 	"flag"
 	"fmt"
 	"github.com/sashabaranov/go-openai"
-	"io"
+	"golang.org/x/crypto/ssh/terminal"
 	"log"
 	"os"
 )
@@ -28,18 +28,28 @@ func init() {
 func askGpt4(
 	command string,
 	data string,
+	gptVersion int,
 ) string {
 	// This function is assumed to be implemented already
 	// see https://github.com/sashabaranov/go-openai
+
+	// convert gptVersion to string, either openai.GPT3Dot5Turbo or openai.GPT4
+	gptVersionEnum := openai.GPT3Dot5Turbo
+	if gptVersion == 4 {
+		gptVersionEnum = openai.GPT4
+	}
+
 	resp, err := openaiClient.CreateChatCompletion(
 		context.Background(),
 		openai.ChatCompletionRequest{
-			Model:       openai.GPT3Dot5Turbo,
+			Model:       gptVersionEnum,
 			Temperature: 0.1,
 			Messages: []openai.ChatCompletionMessage{
 				{
-					Role:    openai.ChatMessageRoleSystem,
-					Content: "You are a CLI tool. Please process the following data + instruction. Your output should not include any explanations or markdown or such. Only raw cli output, so that it could be used for example inside a cli script or unix pipe (|) chain of operations.",
+					Role: openai.ChatMessageRoleSystem,
+					Content: "You are a CLI tool. Please process the following data + instruction.\n" +
+						"Your output should not include any explanations or markdown or such.\n" +
+						"Only raw cli output, so that it could be used for example inside a cli script or unix pipe (|) chain of operations.\n",
 				},
 				{
 					Role:    openai.ChatMessageRoleUser,
@@ -59,14 +69,31 @@ func askGpt4(
 	return resp.Choices[0].Message.Content
 }
 
+func readAllStdIn() string {
+	// Read all stdin
+	buf := new(bytes.Buffer)
+	_, err := buf.ReadFrom(os.Stdin)
+	if err != nil {
+		log.Fatal("Could not read std in")
+	}
+	return buf.String()
+}
+
 func main() {
 
 	// Define permission flags
 	var fs string
 	var network bool
+	var gptVersion int
 	flag.StringVar(&fs, "fs", "", "File system permissions: ro (read-only) or rw (read-write)")
 	flag.BoolVar(&network, "netw", false, "Enable networking permissions")
+	flag.IntVar(&gptVersion, "gpt", 3, "GPT version, 3 or 4")
 	flag.Parse()
+
+	// Validate gptVersion flags
+	if gptVersion != 3 && gptVersion != 4 {
+		log.Fatal("Invalid --gpt flag value, must be 3 or 4")
+	}
 
 	// Validate permission flags
 	if fs != "" && fs != "ro" && fs != "rw" {
@@ -81,22 +108,14 @@ func main() {
 
 	command := args[0]
 
-	// Read input from stdin
+	// Read input from stdin if not connected to a terminal
 	inputData := ""
-	reader := bufio.NewReader(os.Stdin)
-	for {
-		line, err := reader.ReadString('\n')
-		if err != nil && err != io.EOF {
-			log.Fatal("Error reading from stdin:", err)
-		}
-		inputData += line
-		if err == io.EOF {
-			break
-		}
+	if !terminal.IsTerminal(int(os.Stdin.Fd())) {
+		inputData = readAllStdIn()
 	}
 
 	// Process input with GPT-4
-	processedData := askGpt4(inputData, command)
+	processedData := askGpt4(inputData, command, gptVersion)
 
 	// Write output to stdout
 	fmt.Print(processedData)
