@@ -10,6 +10,7 @@ import (
 	"log"
 	"os"
 	"strconv"
+	"strings"
 )
 
 var openaiClient *openai.Client
@@ -118,7 +119,12 @@ func main() {
 		log.Fatalf("Usage: %s [--fs=ro|--fs=rw] [--gpt=4|--gpt=3] [--netw] <command>\n", os.Args[0])
 	}
 
-	command := args[0]
+	// concatenate all args into a single string with spaces between
+	command := ""
+	for _, arg := range args {
+		command += arg + " "
+	}
+	command = strings.TrimSpace(command)
 
 	// Read input from stdin if not connected to a terminal
 	inputData := ""
